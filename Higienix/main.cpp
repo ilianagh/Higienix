@@ -34,8 +34,11 @@ bool runningFlag = false;
 int state = 0;
 int textSize = 1;
 
-typedef enum {notRunning, running, dealing, hitting, standing, playerWon, playerLost, notDealing} states;
+typedef enum {notRunning, running, playerWon, playerLost} states;
 states game_state = notRunning;
+
+typedef enum {menu, instructions} screens;
+screens game_screen = menu;
 
 //Despliega texto en la ventana gráfica
 void draw3dString (void *font, char *s, float x, float y, float z)
@@ -47,7 +50,7 @@ void draw3dString (void *font, char *s, float x, float y, float z)
     glTranslatef(x, y, z);
     
     if (textSize == 1)
-        glScaled(0.2, 0.2, 0.2);
+        glScaled(0.2, 0.2, 0.01);
     
     else if (textSize == 2)
         glScaled(0.25, 0.25, 0.25);
@@ -71,30 +74,26 @@ void timer(int value)
     
 }
 
-void drawTitle()
+void drawMenuScreen()
 {
     glColor3ub(0, 0, 0);
     
-    char title1[17] = "Las Aventuras de";
+    char title1[] = "Las Aventuras de";
     textSize = 3;
     xRaster = 175;
     yRaster = screenHeight-100;
     draw3dString(GLUT_STROKE_MONO_ROMAN, title1, xRaster, yRaster, 0);
     
-    char title2[9] = "Higienix";
+    char title2[] = "Higienix";
     textSize = 4;
     xRaster = 250;
     yRaster = screenHeight-155;
     draw3dString(GLUT_STROKE_MONO_ROMAN, title2, xRaster, yRaster, 0);
-}
-
-void drawGameMenu()
-{
-    glColor3ub(0, 0, 0);
     
-    char jugar[10] = "Jugar";
-    char niveles[10] = "Niveles";
-    char instr[20] = "Instrucciones";
+    char jugar[] = "Jugar";
+    char niveles[] = "Niveles";
+    char instr[] = "Instrucciones";
+    
     
     textSize = 2;
     
@@ -111,39 +110,32 @@ void drawGameMenu()
     draw3dString(GLUT_STROKE_MONO_ROMAN, instr, xRaster, yRaster, 0);
     
     textSize = 1;
-    char salir[10] = "salir-esc";
+    char salir[] = "salir-esc";
     xRaster = 5;
     yRaster = 10;
     draw3dString(GLUT_STROKE_MONO_ROMAN, salir, xRaster, yRaster, 0);
 }
 
-void drawGameScores()
+void drawGameInstructions()
 {
-    
-}
-
-void play()
-{
-    
-}
-
-void levels()
-{
-    
-}
-
-void instructions()
-{
-    
+    glColor3ub(0, 0, 0);
+    textSize = 1;
+    xRaster = 150;
+    yRaster = 10;
+    char creditos[] = "Eliezer Galvan - Iliana Garcia";
+    draw3dString(GLUT_STROKE_MONO_ROMAN, creditos, xRaster, yRaster, 0);
 }
 
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     
-    drawTitle();
-    drawGameMenu();
-    drawGameScores();
+    if (game_screen == menu) {
+        drawMenuScreen();
+    }
+    else if (game_screen == instructions) {
+        drawGameInstructions();
+    }
     
     glutSwapBuffers();
 }
@@ -151,24 +143,27 @@ void display()
 void keyboard(unsigned char key, int mouseX, int mouseY)
 {
     switch (key){
-        case 'j':
+        case 'j': // jugar
         case 'J':
-            play(); // jugar
             break;
-        case 'n':
+        case 'n': // niveles
         case 'N':
-            levels(); // niveles
             break;
-        case 'i':
+        case 'i': // instrucciones
         case 'I':
-            instructions(); // instrucciones
+            if (game_screen == instructions) {
+                game_screen = menu;
+            }
+            else {
+                game_screen = instructions;
+            }
             break;
-        case 27: //esc
+        case 27: //esc - salir
             exit(0); //terminate the program
-            
         default:
             break; //do nothing
     }
+    
     glutPostRedisplay();
 }
 
@@ -198,7 +193,8 @@ int main(int argc, char *argv[])
     glutInit(&argc, argv);
     
     glutInitWindowSize(screenWidth,screenHeight);
-    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)-screenWidth)/2,(glutGet(GLUT_SCREEN_HEIGHT)-screenWidth)/2);
+    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH) - screenWidth) / 2,
+                           (glutGet(GLUT_SCREEN_HEIGHT) - screenWidth) / 2);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutCreateWindow("Higienix");
     
