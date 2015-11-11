@@ -10,6 +10,7 @@
 		2094B8B81BD8974100F868EC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2094B8B71BD8974100F868EC /* main.cpp */; };
 		2094B8C01BD89A3300F868EC /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2094B8BE1BD89A3300F868EC /* GLUT.framework */; };
 		2094B8C11BD89A3300F868EC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2094B8BF1BD89A3300F868EC /* OpenGL.framework */; };
+		20C301CA1BF308C200EB0A08 /* ImageLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20C301C91BF308C200EB0A08 /* ImageLoader.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +30,12 @@
 		2094B8B71BD8974100F868EC /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		2094B8BE1BD89A3300F868EC /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		2094B8BF1BD89A3300F868EC /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		20C301C41BF308A700EB0A08 /* floor.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = floor.bmp; sourceTree = "<group>"; };
+		20C301C51BF308A700EB0A08 /* floor2.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = floor2.bmp; sourceTree = "<group>"; };
+		20C301C61BF308A700EB0A08 /* wall.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = wall.bmp; sourceTree = "<group>"; };
+		20C301C71BF308A700EB0A08 /* wall2.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = wall2.bmp; sourceTree = "<group>"; };
+		20C301C81BF308C200EB0A08 /* ImageLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ImageLoader.hpp; sourceTree = "<group>"; };
+		20C301C91BF308C200EB0A08 /* ImageLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageLoader.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,9 +72,23 @@
 		2094B8B61BD8974100F868EC /* Higienix */ = {
 			isa = PBXGroup;
 			children = (
+				20C301C31BF308A700EB0A08 /* textures */,
 				2094B8B71BD8974100F868EC /* main.cpp */,
+				20C301C81BF308C200EB0A08 /* ImageLoader.hpp */,
+				20C301C91BF308C200EB0A08 /* ImageLoader.cpp */,
 			);
 			path = Higienix;
+			sourceTree = "<group>";
+		};
+		20C301C31BF308A700EB0A08 /* textures */ = {
+			isa = PBXGroup;
+			children = (
+				20C301C41BF308A700EB0A08 /* floor.bmp */,
+				20C301C51BF308A700EB0A08 /* floor2.bmp */,
+				20C301C61BF308A700EB0A08 /* wall.bmp */,
+				20C301C71BF308A700EB0A08 /* wall2.bmp */,
+			);
+			path = textures;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,6 +147,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20C301CA1BF308C200EB0A08 /* ImageLoader.cpp in Sources */,
 				2094B8B81BD8974100F868EC /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -243,6 +265,7 @@
 				2094B8BD1BD8974100F868EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
