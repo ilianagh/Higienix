@@ -46,6 +46,11 @@
 		20C301C91BF308C200EB0A08 /* ImageLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageLoader.cpp; sourceTree = "<group>"; };
 		9AAD816E1BF9C56B00383263 /* cake.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = cake.mtl; sourceTree = "<group>"; };
 		9AAD816F1BF9C56B00383263 /* cake.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = cake.obj; sourceTree = "<group>"; };
+		9AC2D7931BF9CE3A006931C7 /* soap.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = soap.mtl; sourceTree = "<group>"; };
+		9AC2D7941BF9CE3A006931C7 /* soap.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = soap.obj; sourceTree = "<group>"; };
+		9AC2D7951BF9CF5F006931C7 /* bacteria1.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = bacteria1.obj; sourceTree = "<group>"; };
+		9AC2D7961BF9CF5F006931C7 /* bacteria1.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = bacteria1.mtl; sourceTree = "<group>"; };
+		9AC2D7981BF9CF5F006931C7 /* Water_Sparkling.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Water_Sparkling.jpg; sourceTree = "<group>"; };
 		9AC897C61BF539FC000F352F /* glm_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glm_util.c; sourceTree = "<group>"; };
 		9AC897C71BF539FC000F352F /* glm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glm.c; sourceTree = "<group>"; };
 		9AC897C81BF539FC000F352F /* glm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glm.h; sourceTree = "<group>"; };
@@ -116,10 +121,23 @@
 		9AAD816B1BF9C54E00383263 /* objects */ = {
 			isa = PBXGroup;
 			children = (
+				9AC2D7951BF9CF5F006931C7 /* bacteria1.obj */,
+				9AC2D7961BF9CF5F006931C7 /* bacteria1.mtl */,
+				9AC2D7971BF9CF5F006931C7 /* bacteria1 */,
+				9AC2D7931BF9CE3A006931C7 /* soap.mtl */,
+				9AC2D7941BF9CE3A006931C7 /* soap.obj */,
 				9AAD816E1BF9C56B00383263 /* cake.mtl */,
 				9AAD816F1BF9C56B00383263 /* cake.obj */,
 			);
 			path = objects;
+			sourceTree = "<group>";
+		};
+		9AC2D7971BF9CF5F006931C7 /* bacteria1 */ = {
+			isa = PBXGroup;
+			children = (
+				9AC2D7981BF9CF5F006931C7 /* Water_Sparkling.jpg */,
+			);
+			path = bacteria1;
 			sourceTree = "<group>";
 		};
 		9AC897C51BF539ED000F352F /* glm */ = {

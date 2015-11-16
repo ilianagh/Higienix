@@ -39,7 +39,7 @@
 //Amount of models and model ids
 #define MODEL_COUNT 10
 
-#define TOOTHPASTE_MOD 0
+#define BACTERIA_1_MOD 0
 
 using namespace std;
 
@@ -447,8 +447,8 @@ void drawMaze()
 			glColor3d(1, 1, 1);
 			*/
 			
-			glScaled(.5, .5, .5);
-			glmDraw(&models[TOOTHPASTE_MOD], GLM_COLOR | GLM_FLAT);
+			//glScaled(.5, .5, .5);
+			//glmDraw(&models[BACTERIA_1_MOD], GLM_COLOR | GLM_FLAT);
 			
 			glPopMatrix();
 		}
@@ -459,9 +459,16 @@ void drawMaze()
 		if(!enemies[i].found){
 			glPushMatrix();
 			glTranslatef (enemies[i].x+0.5f, enemies[i].y+0.5f, enemies[i].z+0.5f);
+			
+			/*
 			glColor3d(1, 0, 1);
 			glutSolidSphere(0.5,100,100);
 			glColor3d(1, 1, 1);
+			*/
+			
+			glScaled(0.8, 0.8, 0.8);
+			glmDraw(&models[BACTERIA_1_MOD], GLM_COLOR | GLM_FLAT);
+			
 			glPopMatrix();
 		}
 	}
@@ -844,12 +851,12 @@ void init()
     loadImage("textures/wall.bmp", i++);
 	
 	//Load models
-	std::string ruta = fullPath + "objects/cake.obj";
+	std::string ruta = fullPath + "objects/bacteria1.obj";
 	std::cout << "Filepath: " << ruta << std::endl;
 	
-	models[TOOTHPASTE_MOD] = *glmReadOBJ(ruta.c_str());
-	glmUnitize(&models[TOOTHPASTE_MOD]);
-	glmVertexNormals(&models[TOOTHPASTE_MOD], 90.0, GL_TRUE);
+	models[BACTERIA_1_MOD] = *glmReadOBJ(ruta.c_str());
+	glmUnitize(&models[BACTERIA_1_MOD]);
+	glmVertexNormals(&models[BACTERIA_1_MOD], 90.0, GL_TRUE);
 }
 
 void display()
