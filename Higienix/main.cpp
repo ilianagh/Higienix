@@ -40,6 +40,7 @@
 #define MODEL_COUNT 10
 
 #define BACTERIA_1_MOD 0
+#define SOAP_1_MOD 1
 
 using namespace std;
 
@@ -447,8 +448,8 @@ void drawMaze()
 			glColor3d(1, 1, 1);
 			*/
 			
-			//glScaled(.5, .5, .5);
-			//glmDraw(&models[BACTERIA_1_MOD], GLM_COLOR | GLM_FLAT);
+			glScaled(0.7, 0.7, 0.7);
+			glmDraw(&models[SOAP_1_MOD], GLM_COLOR | GLM_FLAT);
 			
 			glPopMatrix();
 		}
@@ -857,6 +858,13 @@ void init()
 	models[BACTERIA_1_MOD] = *glmReadOBJ(ruta.c_str());
 	glmUnitize(&models[BACTERIA_1_MOD]);
 	glmVertexNormals(&models[BACTERIA_1_MOD], 90.0, GL_TRUE);
+	
+	ruta = fullPath + "objects/soap.obj";
+	std::cout << "Filepath: " << ruta << std::endl;
+	
+	models[SOAP_1_MOD] = *glmReadOBJ(ruta.c_str());
+	glmUnitize(&models[SOAP_1_MOD]);
+	glmVertexNormals(&models[SOAP_1_MOD], 90.0, GL_TRUE);
 }
 
 void display()
