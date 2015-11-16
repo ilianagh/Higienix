@@ -20,19 +20,26 @@
 #include <cstring>
 #include <math.h>
 
+#include "glm.h"
+
 #include "ImageLoader.hpp"
 
 #define TRUE 1
 #define FALSE 0
 
 //Specify if debug logs should be printed
-#define DEBUGGING FALSE
+#define DEBUGGING TRUE
 
 //Amount of textures used and texture ids
 #define TEX_COUNT 2
 
 #define FLOOR_TEX 0
 #define WALL_TEX 1
+
+//Amount of models and model ids
+#define MODEL_COUNT 10
+
+#define TOOTHPASTE_MOD 0
 
 using namespace std;
 
@@ -42,8 +49,9 @@ using namespace std;
 string fullPath = __FILE__;
 
 static GLuint texName[TEX_COUNT];
+GLMmodel models[MODEL_COUNT];
 
-const int screenWidth = 800, screenHeight = 700;
+int screenWidth = 800, screenHeight = 700;
 const int sMax = 6, mapSize = 15, mm = mapSize+1, direction_parts = 72;
 const int movee[4][2] = {{-1,0},{0,-1},{1,0},{0,1}};
 const int move_key[4] = {GLUT_KEY_UP, GLUT_KEY_LEFT, GLUT_KEY_DOWN, GLUT_KEY_RIGHT };
@@ -60,6 +68,11 @@ float lightPos [] = {(int)mapSize/2,  7,  (int)mapSize/2};
 float backgroundColor	[] = {5.0/255.0,62.0/255.0,64.0/255.0};
 float floorColor 		[] = {10.0/255.0,123.0/255.0,127.0/255.0};
 float boxColor 			[] = {18.0/255.0,222.0/255.0,229.0/255.0};
+
+//Level variables
+int level = 0, level_found_items = 0, points = 0;
+const int level_size_items_enemies[3][3] = {{15,5,3},{20,7,5},{30,10,10}};
+
 /////////////
 
 GLdouble xRaster, yRaster; //Text rasters
@@ -85,8 +98,8 @@ struct Tpos{
 struct Player{
     int x,y,z;
     int dx,dz;
-    bool isGo;
-} player,maze_exit;
+    bool isGo, found = false;
+} player,maze_exit,items[10],enemies[10];
 
 struct Maps{
     int x,z;
@@ -95,192 +108,51 @@ struct Maps{
 /// INTERFCAFE DECLARATION ///
 
 void display(void);
-void displayMaze(void);
+void drawMaze(void);
 void genMap(void);
 void exitGame(bool f=false);
 
 /// IMPLEMENTATION ///
 
 //Despliega texto en la ventana gráfica
-void draw3dString (void *font, char *s, float x, float y, float z)
+void draw3dString (void *font, char *s, float x, float y, float z, float scale = -1)
 {
+
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	
     unsigned int i;
     glMatrixMode(GL_MODELVIEW);
     
     glPushMatrix();
     glTranslatef(x, y, z);
-    
-    if (textSize == 1)
-        glScaled(0.2, 0.2, 0.01);
-    
-    else if (textSize == 2)
-        glScaled(0.25, 0.25, 0.25);
-    
-    else if (textSize == 3)
-        glScaled(0.3, 0.3, 0.2);
-    
-    else if (textSize == 4)
-        glScaled(0.4, 0.4, 0.1);
-    
+	
+	if(scale == -1){
+		if (textSize == 1)
+			glScaled(0.02, 0.02, 1);
+		
+		else if (textSize == 2)
+			glScaled(0.025, 0.025, 1);
+		
+		else if (textSize == 3)
+			glScaled(0.03, 0.03, 1);
+		
+		else if (textSize == 4)
+			glScaled(0.04, 0.04, 1);
+	}else{
+		glScaled(scale, scale, scale);
+	}
+	
     for (i = 0; i < s[i] != '\0'; i++)
     {
         glutStrokeCharacter(font, s[i]);
     }
     
     glPopMatrix();
+	
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
 }
-
-void drawMenuScreen()
-{
-    glColor3d(0.0, 0.0, 0.0);
-    
-    char title1[] = "Las Aventuras de";
-    textSize = 3;
-    xRaster = screenWidth/3;
-    yRaster = screenHeight-100;
-    draw3dString(GLUT_STROKE_ROMAN, title1, xRaster, yRaster, 0);
-    
-    char title2[] = "Higienix";
-    textSize = 4;
-    xRaster = screenWidth/3;
-    yRaster = screenHeight-155;
-    draw3dString(GLUT_STROKE_ROMAN, title2, xRaster, yRaster, 0);
-    
-    char jugar[] = "Jugar";
-    char niveles[] = "Niveles";
-    char instr[] = "Instrucciones";
-    
-    
-    textSize = 2;
-    
-    xRaster = screenWidth/3;
-    yRaster = 400;
-    draw3dString(GLUT_STROKE_ROMAN, jugar, xRaster, yRaster, 0);
-    
-    xRaster = screenWidth/3;
-    yRaster = 300;
-    draw3dString(GLUT_STROKE_ROMAN, niveles, xRaster, yRaster, 0);
-    
-    xRaster = screenWidth/3;
-    yRaster = 200;
-    draw3dString(GLUT_STROKE_ROMAN, instr, xRaster, yRaster, 0);
-    
-    textSize = 1;
-    char salir[] = "salir-esc";
-    xRaster = 5;
-    yRaster = 10;
-    draw3dString(GLUT_STROKE_ROMAN, salir, xRaster, yRaster, 0);
-    
-    
-    /*
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texName[0]);
-    
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(540.0f, 0.0f, 0);
-    
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(700.0f, 0.0f, 0);
-    
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(700.0f, 160.0f, 0);
-    
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(540.0f, 160.0f, 0);
-    glEnd();
-     */
-}
-
-void drawGameInstructions()
-{
-    glColor3d(0.0, 0.0, 0.0);
-    textSize = 1;
-    xRaster = 10;
-    yRaster = screenHeight - 30;
-    char juego[] = "Pantalla de instrucciones";
-    draw3dString(GLUT_STROKE_ROMAN, juego, xRaster, yRaster, 0);
-    
-    glColor3d(0.0, 0.0, 0.0);
-    textSize = 1;
-    xRaster = 225;
-    yRaster = 10;
-    char creditos[] = "Eliezer Galvan - Iliana Garcia";
-    draw3dString(GLUT_STROKE_ROMAN, creditos, xRaster, yRaster, 0);
-}
-
-void drawPlay()
-{
-    glColor3d(0.0, 0.0, 0.0);
-    textSize = 1;
-    xRaster = 10;
-    yRaster = screenHeight - 30;
-    char juego[] = "Pantalla de juego";
-    draw3dString(GLUT_STROKE_ROMAN, juego, xRaster, yRaster, 0);
-    
-    if (pauseFlag) {
-        textSize = 4;
-        xRaster = screenWidth / 3 + 50;
-        yRaster = screenHeight / 2;
-        char pauseStr[] = "PAUSA";
-        draw3dString(GLUT_STROKE_MONO_ROMAN, pauseStr, xRaster, yRaster, 0);
-    }
-}
-
-/*
-//Makes the image into a texture, and returns the id of the texture
-void loadTexture(Image* image,int k)
-{
-    glBindTexture(GL_TEXTURE_2D, texName[k]); //Tell OpenGL which texture to edit
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    
-    //Map the image to the texture
-    glTexImage2D(GL_TEXTURE_2D,                //Always GL_TEXTURE_2D
-                 0,                            //0 for now
-                 GL_RGB,                       //Format OpenGL uses for image
-                 image->width, image->height,  //Width and height
-                 0,                            //The border of the image
-                 GL_RGB, //GL_RGB, because pixels are stored in RGB format
-                 GL_UNSIGNED_BYTE, //GL_UNSIGNED_BYTE, because pixels are stored
-                 //as unsigned numbers
-                 image->pixels);               //The actual pixel data
-    
-}
-
-void initRendering()
-{
-    GLuint i=0;
-    GLfloat ambientLight[] = {0.2f, 0.2f, 0.2f, 1.0f};
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
-    
-    GLfloat directedLight[] = {0.9f, 0.9f, 0.9f, 1.0f};
-    GLfloat directedLightPos[] = {-10.0f, 15.0f, 20.0f, 0.0f};
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, directedLight);
-    glLightfv(GL_LIGHT0, GL_POSITION, directedLightPos);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_NORMALIZE); ///Users/mariaroque/Imagenes
-    
-    glEnable(GL_TEXTURE_2D);
-    
-    // glEnable(GL_COLOR_MATERIAL);
-    glGenTextures(36, texName); //Make room for our texture
-    Image* image;
-    
-    image = loadBMP("/Users/ilianagh/Documents/Projects-Xcode/Higienix/Higienix/bmp Tec Mty.bmp");
-    loadTexture(image,i++);
-    
-    delete image;
-}
-*/
 
 void onMenu(int v)
 {
@@ -305,8 +177,8 @@ void createMenus()
     int mainMenu, creditsMenu;
     
     creditsMenu = glutCreateMenu(onMenu);
-    glutAddMenuEntry("Eliezer Galvan", -1);
-    glutAddMenuEntry("Iliana Garcia", -1);
+    glutAddMenuEntry("Eliézer Galván", -1);
+    glutAddMenuEntry("Iliana García", -1);
     
     mainMenu = glutCreateMenu(onMenu);
     glutAddMenuEntry("Menú principal", MENU);
@@ -316,8 +188,6 @@ void createMenus()
     
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
-
-////////////////////////////////////////////////////
 
 void drawFloor(GLfloat x1, GLfloat x2, GLfloat z1, GLfloat z2)
 {
@@ -420,24 +290,213 @@ void drawBox (GLint j, GLint i)
     glEnd();
 }
 
-void draw3dString (void *font, char *s, float x, float y, float z, float scale)
+void drawMenuScreen()
 {
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef(x, y, z);
-    glScaled(scale,scale,scale);
-    for (int i = 0; i < s[i] != '\0'; i++){
-        glutStrokeCharacter(font, s[i]);
-    }
-    glPopMatrix();
+	//glViewport(0, 0, screenWidth, screenHeight);
+	gluOrtho2D(0, screenWidth, 0, screenHeight);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
+	
+	glColor3d(1,1,1);
+	
+	char title1[] = "Las Aventuras de";
+	textSize = 2;
+	xRaster = -14;
+	yRaster = 10;
+	draw3dString(GLUT_STROKE_ROMAN, title1, xRaster, yRaster, 0);
+	
+	char title2[] = "Higienix";
+	textSize = 4;
+	xRaster = -8;
+	yRaster = 5;
+	draw3dString(GLUT_STROKE_ROMAN, title2, xRaster, yRaster, 0);
+	
+	char jugar[] = "Jugar";
+	char niveles[] = "Niveles";
+	char instr[] = "Instrucciones";
+	
+	textSize = 1;
+	
+	xRaster = -3;
+	yRaster = -1;
+	draw3dString(GLUT_STROKE_ROMAN, jugar, xRaster, yRaster, 0);
+	xRaster = -4;
+	yRaster = -5;
+	draw3dString(GLUT_STROKE_ROMAN, niveles, xRaster, yRaster, 0);
+	xRaster = -7.5;
+	yRaster = -9;
+	draw3dString(GLUT_STROKE_ROMAN, instr, xRaster, yRaster, 0);
+	
+	textSize = 1;
+	char salir[] = "Salir";
+	xRaster = -2;
+	yRaster = -13.5;
+	draw3dString(GLUT_STROKE_ROMAN, salir, xRaster, yRaster, 0);
+}
+
+void drawGameInstructions()
+{
+	glColor3d(1,1,1);
+	
+	textSize = 1;
+	
+	xRaster = -15;
+	yRaster = 10;
+	char juego[] = "Pantalla de instrucciones";
+	draw3dString(GLUT_STROKE_ROMAN, juego, xRaster, yRaster, 0);
+	
+	xRaster = -8;
+	yRaster = -9;
+	char creditos1[] = "Eliezer Galvan";
+	draw3dString(GLUT_STROKE_ROMAN, creditos1, xRaster, yRaster, 0);
+	
+	xRaster = -7;
+	yRaster = -13;
+	char creditos2[] = "Iliana Garcia";
+	draw3dString(GLUT_STROKE_ROMAN, creditos2, xRaster, yRaster, 0);
+}
+
+void drawMaze()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	int bannerHeight = 100;
+	
+	glViewport(0, 0, screenWidth, screenHeight);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
+	
+	glColor3d(1, 1, 1);
+	textSize = 1;
+	char c_points[50];
+	
+	//Draw game stats
+	sprintf(c_points, "Puntos: %d",points);
+	draw3dString(GLUT_STROKE_ROMAN, c_points, -5, 12.5, 0, 0.01);
+	
+	sprintf(c_points, "Objetos: %d/%d",level_found_items,level_size_items_enemies[level][1]);
+	draw3dString(GLUT_STROKE_ROMAN, c_points, 5, 12.5, 0, 0.01);
+	
+	sprintf(c_points, "Nivel: %d",level+1);
+	draw3dString(GLUT_STROKE_ROMAN, c_points, -15, 12.5, 0, 0.01);
+	
+	//Return to general view
+	glViewport(0, 0, screenWidth, screenHeight-bannerHeight);
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	
+	gluPerspective(60.0, (GLfloat)screenWidth/(GLfloat)screenHeight, 1.0, 60.0);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
+	//Set camera
+	gluLookAt(
+			  player.x+(1.0*player.dx/sMax)+0.5f+3*cos(M_PI_2+current_direction/double(direction_parts)*2.*M_PI),
+			  player.y+camera_zoom,
+			  player.z+(1.0*player.dz/sMax)+0.5f+3*sin(M_PI_2+current_direction/double(direction_parts)*2.*M_PI),
+			  player.x+(1.0*player.dx/sMax)+0.5f,
+			  player.y+0.5f,
+			  player.z+(1.0*player.dz/sMax)+0.5f,
+			  0,
+			  1,
+			  0
+			  );
+	
+	//Draw maze
+	for (int i=0; i<map.x; i++){
+		for (int j=0; j<map.z; j++){
+			if (data[j][i] == 'x'){
+				drawBox(j,i);
+			}else {
+				drawFloor(i,i+1,j,j+1);
+			}
+		}
+	}
+	
+	//Draw player
+	glPushMatrix();
+	glTranslatef (player.x+(1.0*player.dx/sMax)+0.5f, player.y+0.5f, player.z+(1.0*player.dz/sMax)+0.5f);
+	glColor3d(1,0,0);
+	glutSolidSphere(0.3,100,100);
+	glColor3d(1, 1, 1);
+	glPopMatrix();
+	
+	//Draw maze exit
+	glPushMatrix();
+	glTranslatef (maze_exit.x+0.5f, maze_exit.y+0.5f, maze_exit.z+0.5f);
+	glColor3d(0, 1, 0);
+	glutSolidSphere(0.5,100,100);
+	glColor3d(1, 1, 1);
+	glPopMatrix();
+	
+	//Draw items
+	for(int i=0; i<level_size_items_enemies[level][1]; i++){
+		if(!items[i].found){
+			glPushMatrix();
+			glTranslatef (items[i].x+0.5f, items[i].y+0.5f, items[i].z+0.5f);
+			
+			/*
+			glColor3d(0, 1, 1);
+			glutSolidSphere(0.5,100,100);
+			glColor3d(1, 1, 1);
+			*/
+			
+			glScaled(.5, .5, .5);
+			glmDraw(&models[TOOTHPASTE_MOD], GLM_COLOR | GLM_FLAT);
+			
+			glPopMatrix();
+		}
+	}
+	
+	//Draw enemies
+	for(int i=0; i<level_size_items_enemies[level][2]; i++){
+		if(!enemies[i].found){
+			glPushMatrix();
+			glTranslatef (enemies[i].x+0.5f, enemies[i].y+0.5f, enemies[i].z+0.5f);
+			glColor3d(1, 0, 1);
+			glutSolidSphere(0.5,100,100);
+			glColor3d(1, 1, 1);
+			glPopMatrix();
+		}
+	}
 }
 
 void animate()
 {
+	//Check if player found exit
     if ((player.x == maze_exit.x) && (player.z == maze_exit.z)){
-        exitGame(true);
+		if(level_found_items != level_size_items_enemies[level][1]){
+			cout << "Not enough objects!!" << endl;
+		}else{
+			exitGame(true);
+		}
     }
-    
+	
+	//Check if player found item
+	for(int i=0; i<level_size_items_enemies[level][1]; i++){
+		if ((player.x == items[i].x) && (player.z == items[i].z) && !items[i].found){
+			cout << "Player found item " << i << endl;
+			items[i].found = true;
+			level_found_items++;
+			points += 50;
+		}
+	}
+	
+	//Check if player found enemy
+	for(int i=0; i<level_size_items_enemies[level][2]; i++){
+		if ((player.x == enemies[i].x) && (player.z == enemies[i].z) && !enemies[i].found){
+			cout << "Player found enemy " << i << endl;
+			enemies[i].found = true;
+			points -= 20;
+		}
+	}
+	
     if (player.isGo == true){
         
         if(player.dx > 0)
@@ -664,8 +723,8 @@ void genMap()
             }
     
     Tpos ps[11]; k=0;
-    while (k<=10)
-    {
+	
+    while (k<=10){
         t.x = rand()%mm+1;
         t.y = rand()%mm+1;
         if (data[t.y][t.x]=='.')
@@ -674,14 +733,48 @@ void genMap()
             k++;
         }
     }
+	
     k=rand()%11;
     player.x=ps[k].x;
     player.z=ps[k].y;
-    DataToCp();
-    fill(ps[k].y,ps[k].x,&t,&minPathLength);
-    maze_exit.x=t.x;
-    maze_exit.z=t.y;
-    
+	
+	DataToCp();
+	
+	data[player.z][player.x] = 'P';
+	
+	fill(ps[k].y,ps[k].x,&t,&minPathLength);
+	
+	//Generate maze exit
+	maze_exit.x = t.x;
+    maze_exit.z = t.y;
+	data[t.y][t.x] = 'O';
+	
+	//Generate item positions
+	for(int i=0; i<level_size_items_enemies[level][1]; i++){
+		int t_x = rand()%mm+1;
+		int t_y = rand()%mm+1;
+		while(data[t_x][t_y] != '.'){
+			t_x = rand()%mm+1;
+			t_y = rand()%mm+1;
+		}
+		items[i].x = t_x;
+		items[i].z = t_y;
+		data[t_y][t_x] = 'I';
+	}
+	
+	//Generate enemy positions
+	for(int i=0; i<level_size_items_enemies[level][2]; i++){
+		int t_x = rand()%mm+1;
+		int t_y = rand()%mm+1;
+		while(data[t_x][t_y] != '.'){
+			t_x = rand()%mm+1;
+			t_y = rand()%mm+1;
+		}
+		enemies[i].x = t_x;
+		enemies[i].z = t_y;
+		data[t_y][t_x] = 'E';
+	}
+	
     if(DEBUGGING){
         printf("Maze loading complete.\n");
         for (j=0;j<map.z;j++){
@@ -749,128 +842,44 @@ void init()
     
     loadImage("textures/floor.bmp", i++);
     loadImage("textures/wall.bmp", i++);
+	
+	//Load models
+	std::string ruta = fullPath + "objects/cake.obj";
+	std::cout << "Filepath: " << ruta << std::endl;
+	
+	models[TOOTHPASTE_MOD] = *glmReadOBJ(ruta.c_str());
+	glmUnitize(&models[TOOTHPASTE_MOD]);
+	glmVertexNormals(&models[TOOTHPASTE_MOD], 90.0, GL_TRUE);
 }
 
 void display()
 {
-    //glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    if (game_screen == MENU)
-    {
+	
+    if (game_screen == MENU){
         drawMenuScreen();
-    }
-    else if (game_screen == INSTRUCTIONS)
-    {
+    }else if (game_screen == INSTRUCTIONS){
         drawGameInstructions();
+    }else if (game_screen == PLAY){
+        drawMaze();
     }
-    else if (game_screen == PLAY)
-    {
-        //drawPlay();
-        displayMaze();
-    }
-    
+	
     glutSwapBuffers();
-}
-
-void displayMaze()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    /*
-     //BEGIN 2D
-     glMatrixMode(GL_PROJECTION);
-     glPushMatrix();
-     glLoadIdentity();
-     glOrtho(0, screenWidth, 0, screenHeight, 1, 20);
-     glMatrixMode(GL_MODELVIEW);
-     glLoadIdentity();
-     glDisable(GL_DEPTH_TEST);
-     ///
-     
-     //Draw points in banner
-     char points[50];
-     sprintf(points, "Points: %d",0);
-     glColor3d(1, 1, 1);
-     draw3dString(GLUT_STROKE_ROMAN, points, 50, 50, 20, 0.2);
-     
-     //END 2D
-     glEnable(GL_DEPTH_TEST);
-     glMatrixMode(GL_PROJECTION);
-     glPopMatrix();
-     glMatrixMode(GL_MODELVIEW);
-     ///
-     */
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
-    //Set camera
-    gluLookAt(
-              player.x+(1.0*player.dx/sMax)+0.5f+3*cos(M_PI_2+current_direction/double(direction_parts)*2.*M_PI),
-              player.y+camera_zoom,
-              player.z+(1.0*player.dz/sMax)+0.5f+3*sin(M_PI_2+current_direction/double(direction_parts)*2.*M_PI),
-              player.x+(1.0*player.dx/sMax)+0.5f,
-              player.y+0.5f,
-              player.z+(1.0*player.dz/sMax)+0.5f,
-              0,
-              1,
-              0
-              );
-    
-    //Draw maze
-    for (int i=0; i<map.x; i++){
-        for (int j=0; j<map.z; j++){
-            if (data[j][i] == 'x'){
-                drawBox(j,i);
-            }else {
-                drawFloor(i,i+1,j,j+1);
-            }
-        }
-    }
-    
-    //Draw player
-    glPushMatrix();
-    glTranslatef (player.x+(1.0*player.dx/sMax)+0.5f, player.y+0.5f, player.z+(1.0*player.dz/sMax)+0.5f);
-    glColor3d(1,0,0);
-    glutSolidSphere(0.3,100,100);
-    glColor3d(1, 1, 1);
-    glPopMatrix();
-    
-    //Draw maze exit
-    glPushMatrix();
-    glTranslatef (maze_exit.x+0.5f, maze_exit.y+0.5f, maze_exit.z+0.5f);
-    glColor3d(0, 1, 0);
-    glutSolidSphere(0.5,100,100);
-    glColor3d(1, 1, 1);
-    glPopMatrix();
-    
-    
-    //glutSwapBuffers();
 }
 
 void reshape(int w, int h)
 {
-    //glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-    //glMatrixMode(GL_PROJECTION);
-    //glLoadIdentity ();
-    //glOrtho(0, screenWidth, 0, screenHeight, 100, 300 ); //izq, der, abajo, arriba, cerca, lejos
-    //glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
-    //gluLookAt(0, 0, 200, 0, 0, 0, 0, 1, 0);
-    
-    ////////////////
-    
+	screenWidth = w;
+	screenHeight = h;
+	
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
     gluPerspective(60.0, (GLfloat)w/(GLfloat)h, 1.0, 60.0);
-    //glOrtho(0, screenWidth, 0, screenHeight, 100, 300);
-    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
+	
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -1008,7 +1017,7 @@ int main(int argc, char *argv[])
     glWin = glutCreateWindow("Higienx");
     
     init();
-    
+	
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     //glutMouseFunc(mouse);
@@ -1022,8 +1031,8 @@ int main(int argc, char *argv[])
     
     if(!DEBUGGING){
         glutFullScreen();
-    }
-    
+   	}
+	
     glutMainLoop();
     return EXIT_SUCCESS;
 }
