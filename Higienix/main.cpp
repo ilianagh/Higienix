@@ -82,13 +82,15 @@ bool runningFlag = false;
 int state = 0;
 int textSize = 1;
 
-typedef enum {notPlaying, playing, playerWon, playerLost} states;
-states game_state = notPlaying;
+//typedef enum {notPlaying, playing, playerWon, playerLost} states;
+//states game_state = notPlaying;
 
-typedef enum {MENU, INSTRUCTIONS, PLAY} screens;
+typedef enum {MENU, INSTRUCTIONS, PLAY, GAMEOVER} screens;
 int game_screen = MENU;
 
-bool pauseFlag = false;
+//bool gameOverFlag = false;
+
+//bool pauseFlag = false;
 
 /// OBJECT MODELS ///
 
@@ -183,7 +185,7 @@ void createMenus()
     
     mainMenu = glutCreateMenu(onMenu);
     glutAddMenuEntry("Menú principal", MENU);
-    glutAddMenuEntry("Instrucciones", INSTRUCTIONS);
+    //glutAddMenuEntry("Instrucciones", INSTRUCTIONS);
     glutAddSubMenu("Creditos", creditsMenu);
     glutAddMenuEntry("SALIR", 100);
     
@@ -293,7 +295,7 @@ void drawBox (GLint j, GLint i)
 
 void drawMenuScreen()
 {
-	//glViewport(0, 0, screenWidth, screenHeight);
+	glViewport(0, 0, screenWidth, screenHeight);
 	gluOrtho2D(0, screenWidth, 0, screenHeight);
 	
 	glMatrixMode(GL_MODELVIEW);
@@ -357,6 +359,24 @@ void drawGameInstructions()
 	yRaster = -13;
 	char creditos2[] = "Iliana Garcia";
 	draw3dString(GLUT_STROKE_ROMAN, creditos2, xRaster, yRaster, 0);
+}
+
+void drawGameOVer()
+{
+    //glViewport(0, 0, screenWidth, screenHeight);
+    gluOrtho2D(0, screenWidth, 0, screenHeight);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
+    
+    glColor3d(1,1,1);
+    
+    char title1[] = "Game Over!";
+    textSize = 2;
+    xRaster = -14;
+    yRaster = 10;
+    draw3dString(GLUT_STROKE_ROMAN, title1, xRaster, yRaster, 0);
 }
 
 void drawMaze()
@@ -482,7 +502,11 @@ void animate()
 		if(level_found_items != level_size_items_enemies[level][1]){
 			cout << "Not enough objects!!" << endl;
 		}else{
-			exitGame(true);
+            cout << "Game Over!" << endl;
+            game_screen = GAMEOVER;
+            return;
+            //gameOverFlag = true;
+			//exitGame(true);
 		}
     }
 	
@@ -908,7 +932,7 @@ void keyboard(unsigned char key, int x, int y)
             case 'j': // jugar
             case 'J':
                 game_screen = PLAY;
-                game_state = playing;
+                //game_state = playing;
                 break;
             case 'n': // niveles
             case 'N':
@@ -923,13 +947,13 @@ void keyboard(unsigned char key, int x, int y)
                     game_screen = INSTRUCTIONS;
                 }
                 break;
-            case 'p':
-            case 'P':
-                if (game_state == playing)
-                {
-                    pauseFlag = !pauseFlag;
-                }
-                break;
+//            case 'p':
+//            case 'P':
+//                if (game_screen == PLAY)
+//                {
+//                    pauseFlag = !pauseFlag;
+//                }
+//                break;
             case 27: //esc - salir
                 exit(0); //terminate the program
             default:
@@ -972,6 +996,11 @@ void keyboard(unsigned char key, int x, int y)
                 current_direction = 0;
                 camera_zoom = 4.0;
                 break;
+            
+            case 'm':
+            case 'M':
+                game_screen = MENU;
+                break;
                 
             default:
                 break;
@@ -980,16 +1009,6 @@ void keyboard(unsigned char key, int x, int y)
     
     glutPostRedisplay();
 }
-
-/*
- void mouse(int button, int state, int x, int y)
-{
-    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    {
-        
-    }
-}
-*/
 
 void key_arrow_movements( int key, int x, int y)
 {
@@ -1011,6 +1030,16 @@ void key_arrow_movements( int key, int x, int y)
         }
     }
 }
+
+/*
+void mouse(int button, int state, int x, int y)
+{
+    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        
+    }
+}
+*/
 
 int main(int argc, char *argv[])
 {
