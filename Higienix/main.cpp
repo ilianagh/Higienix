@@ -462,12 +462,6 @@ void drawMaze()
 			glPushMatrix();
 			glTranslatef (items[i].x+0.5f, items[i].y+0.5f, items[i].z+0.5f);
 			
-			/*
-			glColor3d(0, 1, 1);
-			glutSolidSphere(0.5,100,100);
-			glColor3d(1, 1, 1);
-			*/
-			
 			glScaled(0.7, 0.7, 0.7);
 			glmDraw(&models[SOAP_1_MOD], GLM_COLOR | GLM_FLAT);
 			
@@ -480,12 +474,6 @@ void drawMaze()
 		if(!enemies[i].found){
 			glPushMatrix();
 			glTranslatef (enemies[i].x+0.5f, enemies[i].y+0.5f, enemies[i].z+0.5f);
-			
-			/*
-			glColor3d(1, 0, 1);
-			glutSolidSphere(0.5,100,100);
-			glColor3d(1, 1, 1);
-			*/
 			
 			glScaled(0.8, 0.8, 0.8);
 			glmDraw(&models[BACTERIA_1_MOD], GLM_COLOR | GLM_FLAT);
@@ -597,7 +585,9 @@ void loadImage(std::string image_name, int image_id)
 {
     Image *image;
     std::string ruta = fullPath + image_name;
-    std::cout << "Filepath: " << ruta << std::endl;
+	if(DEBUGGING){
+		std::cout << "Filepath: " << ruta << std::endl;
+	}
     image = loadBMP(ruta.c_str());
     loadTexture(image,image_id);
     delete image;
@@ -785,7 +775,7 @@ void genMap()
 	for(int i=0; i<level_size_items_enemies[level][1]; i++){
 		int t_x = rand()%mm+1;
 		int t_y = rand()%mm+1;
-		while(data[t_x][t_y] != '.'){
+		while(data[t_y][t_x] != '.'){
 			t_x = rand()%mm+1;
 			t_y = rand()%mm+1;
 		}
@@ -798,7 +788,7 @@ void genMap()
 	for(int i=0; i<level_size_items_enemies[level][2]; i++){
 		int t_x = rand()%mm+1;
 		int t_y = rand()%mm+1;
-		while(data[t_x][t_y] != '.'){
+		while(data[t_y][t_x] != '.'){
 			t_x = rand()%mm+1;
 			t_y = rand()%mm+1;
 		}
