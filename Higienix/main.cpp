@@ -88,10 +88,10 @@ float boxColor 			[] = {18.0/255.0,222.0/255.0,229.0/255.0};
 int level = 0, level_found_items = 0, points = 0;
 const int level_size_items_enemies[3][3] = {{15,5,3},{20,7,5},{30,10,10}};
 
-/////////////
+//Text rasters
+GLdouble xRaster, yRaster;
 
-GLdouble xRaster, yRaster; //Text rasters
-
+//Flags
 bool runningFlag = false;
 int state = 0;
 int textSize = 1;
@@ -124,7 +124,6 @@ void exitGame(bool f=false);
 
 /// IMPLEMENTATION ///
 
-//Despliega texto en la ventana gráfica
 void draw3dString (void *font, char *s, float x, float y, float z, float scale = -1)
 {
 
@@ -999,11 +998,7 @@ void exitGame(bool f)
     exit(EXIT_SUCCESS);
 }
 
-/////////
-
-//
-// INIT + FUNCs
-//
+/// INITIALIZATION ///
 
 void init()
 {
@@ -1214,16 +1209,6 @@ void key_arrow_movements( int key, int x, int y)
         }
     }
 }
-
-/*
-void mouse(int button, int state, int x, int y)
-{
-    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    {
-        
-    }
-}
-*/
 
 int main(int argc, char *argv[])
 {
