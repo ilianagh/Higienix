@@ -28,7 +28,7 @@
 #define FALSE 0
 
 //Specify if debug logs should be printed
-#define DEBUGGING TRUE
+#define DEBUGGING FALSE
 
 //Amount of textures used and texture ids
 #define TEX_COUNT 4
@@ -452,7 +452,7 @@ void drawGameOverScreen()
 	
 	xRaster = -8;
 	yRaster = -12;
-	char inst[] = "Presiona 'M' para volver al menu.";
+	char inst[] = "Presiona 'J' para volver a jugar.";
 	draw3dString(GLUT_STROKE_ROMAN, inst, xRaster, yRaster, 0, 0.008);
 }
 
@@ -663,17 +663,13 @@ void quitMaze()
 
 void animate()
 {
-	//test go directly to gameover screen
-	//game_screen = GAMEOVER;
-	
 	//Check if player found exit
     if ((player.x == maze_exit.x) && (player.z == maze_exit.z)){
 		if(level_found_items != level_size_items_enemies[level][1]){
 			cout << "Not enough objects!!" << endl;
 		}else{
 		
-			if(level == 0){
-			//if(level == MAX_RAW_LEVEL){
+			if(level == MAX_RAW_LEVEL){
 				game_screen = GAMEOVER;
 			}else{
 				cout << "Moving to next level" << endl;
