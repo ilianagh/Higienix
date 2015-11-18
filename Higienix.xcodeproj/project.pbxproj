@@ -46,8 +46,15 @@
 		20C301C91BF308C200EB0A08 /* ImageLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageLoader.cpp; sourceTree = "<group>"; };
 		20CAE4321BFC5EB9008E94F8 /* MenuPrincipal.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = MenuPrincipal.bmp; sourceTree = "<group>"; };
 		20CAE4331BFC5EC1008E94F8 /* Instrucciones.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = Instrucciones.bmp; sourceTree = "<group>"; };
-		9AAD816E1BF9C56B00383263 /* cake.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = cake.mtl; sourceTree = "<group>"; };
-		9AAD816F1BF9C56B00383263 /* cake.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = cake.obj; sourceTree = "<group>"; };
+		9A72262B1BFC6C83001D1C37 /* player.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = player.mtl; sourceTree = "<group>"; };
+		9A72262C1BFC6C83001D1C37 /* player.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = player.obj; sourceTree = "<group>"; };
+		9A72262E1BFC6C83001D1C37 /* Material___1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Material___1.png"; sourceTree = "<group>"; };
+		9A72262F1BFC6DE8001D1C37 /* toothpaste.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = toothpaste.mtl; sourceTree = "<group>"; };
+		9A7226301BFC6DE8001D1C37 /* toothpaste.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = toothpaste.obj; sourceTree = "<group>"; };
+		9A7226321BFC6DE8001D1C37 /* Colgate_Toothpaste_100ml.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Colgate_Toothpaste_100ml.jpg; sourceTree = "<group>"; };
+		9A7226331BFC6DE8001D1C37 /* Translucent_Glass_Tinted.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Translucent_Glass_Tinted.jpg; sourceTree = "<group>"; };
+		9A7226341BFC6DE8001D1C37 /* soap2.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = soap2.mtl; sourceTree = "<group>"; };
+		9A7226351BFC6DE8001D1C37 /* soap2.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = soap2.obj; sourceTree = "<group>"; };
 		9AC2D7931BF9CE3A006931C7 /* soap.mtl */ = {isa = PBXFileReference; lastKnownFileType = text; path = soap.mtl; sourceTree = "<group>"; };
 		9AC2D7941BF9CE3A006931C7 /* soap.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = soap.obj; sourceTree = "<group>"; };
 		9AC2D7951BF9CF5F006931C7 /* bacteria1.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = bacteria1.obj; sourceTree = "<group>"; };
@@ -122,16 +129,39 @@
 			path = textures;
 			sourceTree = "<group>";
 		};
+		9A72262D1BFC6C83001D1C37 /* player */ = {
+			isa = PBXGroup;
+			children = (
+				9A72262E1BFC6C83001D1C37 /* Material___1.png */,
+			);
+			path = player;
+			sourceTree = "<group>";
+		};
+		9A7226311BFC6DE8001D1C37 /* toothpaste */ = {
+			isa = PBXGroup;
+			children = (
+				9A7226321BFC6DE8001D1C37 /* Colgate_Toothpaste_100ml.jpg */,
+				9A7226331BFC6DE8001D1C37 /* Translucent_Glass_Tinted.jpg */,
+			);
+			path = toothpaste;
+			sourceTree = "<group>";
+		};
 		9AAD816B1BF9C54E00383263 /* objects */ = {
 			isa = PBXGroup;
 			children = (
+				9A72262F1BFC6DE8001D1C37 /* toothpaste.mtl */,
+				9A7226301BFC6DE8001D1C37 /* toothpaste.obj */,
+				9A7226311BFC6DE8001D1C37 /* toothpaste */,
+				9A7226341BFC6DE8001D1C37 /* soap2.mtl */,
+				9A7226351BFC6DE8001D1C37 /* soap2.obj */,
+				9A72262B1BFC6C83001D1C37 /* player.mtl */,
+				9A72262C1BFC6C83001D1C37 /* player.obj */,
+				9A72262D1BFC6C83001D1C37 /* player */,
 				9AC2D7951BF9CF5F006931C7 /* bacteria1.obj */,
 				9AC2D7961BF9CF5F006931C7 /* bacteria1.mtl */,
 				9AC2D7971BF9CF5F006931C7 /* bacteria1 */,
 				9AC2D7931BF9CE3A006931C7 /* soap.mtl */,
 				9AC2D7941BF9CE3A006931C7 /* soap.obj */,
-				9AAD816E1BF9C56B00383263 /* cake.mtl */,
-				9AAD816F1BF9C56B00383263 /* cake.obj */,
 			);
 			path = objects;
 			sourceTree = "<group>";

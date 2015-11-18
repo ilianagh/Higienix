@@ -41,8 +41,12 @@
 //Amount of models and model ids
 #define MODEL_COUNT 10
 
-#define BACTERIA_1_MOD 0
-#define SOAP_1_MOD 1
+#define PLAYER_MOD 0
+#define BACTERIA_1_MOD 1
+
+#define SOAP_1_MOD 2
+#define SOAP_2_MOD 3
+#define TOOTHPASTE_MOD 4
 
 //Map limits
 #define MAX_MAP_SIZE 40
@@ -304,9 +308,11 @@ void drawMenuScreen()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
-    
-    glDisable(GL_LIGHTING);
-    
+	
+	glColor3d(1,1,1);
+	glEnable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
+	
     glBindTexture(GL_TEXTURE_2D, texName[MAINMENU_TEX]);
     
     glBegin(GL_POLYGON);
@@ -326,9 +332,7 @@ void drawMenuScreen()
     glVertex3f(-screenWidth/2, screenHeight/2, 0);
     
     glEnd();
-    
-    glEnable(GL_LIGHTING);
-    
+	
     /*
 	glColor3d(1,1,1);
 	
@@ -534,16 +538,18 @@ void drawMaze()
 	//Draw player
 	glPushMatrix();
 	glTranslatef (player.x+(1.0*player.dx/sMax)+0.5f, player.y+0.5f, player.z+(1.0*player.dz/sMax)+0.5f);
-	glColor3d(1,0,0);
-	glutSolidSphere(0.3,100,100);
-	glColor3d(1, 1, 1);
+
+	glRotated(180, 0, 1, 0);
+	glScaled(0.8, 0.8, 0.8);
+	glmDraw(&models[PLAYER_MOD], GLM_COLOR | GLM_FLAT);
+	
 	glPopMatrix();
 	
 	//Draw maze exit
 	glPushMatrix();
 	glTranslatef (maze_exit.x+0.5f, maze_exit.y+0.5f, maze_exit.z+0.5f);
 	glColor3d(0, 1, 0);
-	glutSolidSphere(0.5,100,100);
+	glutSolidSphere(0.3,100,100);
 	glColor3d(1, 1, 1);
 	glPopMatrix();
 	
@@ -553,8 +559,25 @@ void drawMaze()
 			glPushMatrix();
 			glTranslatef (items[i].x+0.5f, items[i].y+0.5f, items[i].z+0.5f);
 			
-			glScaled(0.7, 0.7, 0.7);
-			glmDraw(&models[SOAP_1_MOD], GLM_COLOR | GLM_FLAT);
+			
+			int mod = i%3;
+			switch (mod) {
+				case 0:
+					glScaled(0.7, 0.7, 0.7);
+					glmDraw(&models[SOAP_1_MOD], GLM_COLOR | GLM_FLAT);
+					break;
+				case 1:
+					glScaled(4, 4, 4);
+					glmDraw(&models[SOAP_2_MOD], GLM_COLOR | GLM_FLAT);
+					break;
+				case 2:
+					glScaled(0.7, 0.7, 0.7);
+					glmDraw(&models[TOOTHPASTE_MOD], GLM_COLOR | GLM_FLAT);
+					break;
+					
+				default:
+					break;
+			}
 			
 			glPopMatrix();
 		}
@@ -1028,19 +1051,40 @@ void init()
     loadImage("textures/Instrucciones.bmp", i++);
 	
 	//Load models
-	std::string ruta = fullPath + "objects/bacteria1.obj";
-	std::cout << "Filepath: " << ruta << std::endl;
 	
+	//player
+	std::string ruta = fullPath + "objects/player.obj";
+	std::cout << "Filepath: " << ruta << std::endl;
+	models[PLAYER_MOD] = *glmReadOBJ(ruta.c_str());
+	glmUnitize(&models[PLAYER_MOD]);
+	glmVertexNormals(&models[PLAYER_MOD], 90.0, GL_TRUE);
+	
+	//bacteria
+	ruta = fullPath + "objects/bacteria1.obj";
+	std::cout << "Filepath: " << ruta << std::endl;
 	models[BACTERIA_1_MOD] = *glmReadOBJ(ruta.c_str());
 	glmUnitize(&models[BACTERIA_1_MOD]);
 	glmVertexNormals(&models[BACTERIA_1_MOD], 90.0, GL_TRUE);
 	
+	//items
+	
 	ruta = fullPath + "objects/soap.obj";
 	std::cout << "Filepath: " << ruta << std::endl;
-	
 	models[SOAP_1_MOD] = *glmReadOBJ(ruta.c_str());
 	glmUnitize(&models[SOAP_1_MOD]);
 	glmVertexNormals(&models[SOAP_1_MOD], 90.0, GL_TRUE);
+	
+	ruta = fullPath + "objects/soap2.obj";
+	std::cout << "Filepath: " << ruta << std::endl;
+	models[SOAP_2_MOD] = *glmReadOBJ(ruta.c_str());
+	glmUnitize(&models[SOAP_2_MOD]);
+	glmVertexNormals(&models[SOAP_2_MOD], 90.0, GL_TRUE);
+	
+	ruta = fullPath + "objects/toothpaste.obj";
+	std::cout << "Filepath: " << ruta << std::endl;
+	models[TOOTHPASTE_MOD] = *glmReadOBJ(ruta.c_str());
+	glmUnitize(&models[TOOTHPASTE_MOD]);
+	glmVertexNormals(&models[TOOTHPASTE_MOD], 90.0, GL_TRUE);
 }
 
 void display()
@@ -1048,16 +1092,12 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
     if (game_screen == MENU){
-		//cout << "menu" << endl;
         drawMenuScreen();
     }else if (game_screen == INSTRUCTIONS){
-		//cout << "instrucions" << endl;
         drawGameInstructions();
     }else if (game_screen == PLAY){
-		//cout << "play" << endl;
         drawMaze();
     }else if(game_screen == GAMEOVER){
-		//cout << "gameover" << endl;
 		drawGameOverScreen();
 	}
 	
