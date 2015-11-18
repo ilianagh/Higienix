@@ -42,6 +42,9 @@
 #define BACTERIA_1_MOD 0
 #define SOAP_1_MOD 1
 
+//Map limits
+#define MAX_MAP_SIZE 40
+
 using namespace std;
 
 /// FLAGS AND VARIABLES ///
@@ -53,18 +56,20 @@ static GLuint texName[TEX_COUNT];
 GLMmodel models[MODEL_COUNT];
 
 int screenWidth = 800, screenHeight = 700;
-const int sMax = 6, mapSize = 15, mm = mapSize+1, direction_parts = 72;
+int sMax = 6, mapSize = 15, mm = mapSize+1, direction_parts = 72;
+
 const int movee[4][2] = {{-1,0},{0,-1},{1,0},{0,1}};
 const int move_key[4] = {GLUT_KEY_UP, GLUT_KEY_LEFT, GLUT_KEY_DOWN, GLUT_KEY_RIGHT };
 
 double camera_zoom = 15;
 int current_direction = 0;
 int glWin, minPathLength = 0, myPathLength = 0;
-char data[mapSize+2][mapSize+2], cp[mapSize+2][mapSize+2];
+
+char data[MAX_MAP_SIZE+2][MAX_MAP_SIZE+2], cp[MAX_MAP_SIZE+2][MAX_MAP_SIZE+2];
 
 float lightAmb [] = {0.05, 0.05, 0.05};
 float lightDif [] = {0.95, 0.95, 0.95};
-float lightPos [] = {(int)mapSize/2,  7,  (int)mapSize/2};
+float lightPos [] = {(float)mapSize/2,  7,  (float)mapSize/2};
 
 float backgroundColor	[] = {5.0/255.0,62.0/255.0,64.0/255.0};
 float floorColor 		[] = {10.0/255.0,123.0/255.0,127.0/255.0};
@@ -483,6 +488,25 @@ void drawMaze()
 	}
 }
 
+void nextLevel()
+{
+	level++;
+	level_found_items = 0;
+	mapSize = level_size_items_enemies[level][0];
+	mm = mapSize+1;
+	genMap();
+	
+	//reset item found status
+	for(int i=0; i<level_size_items_enemies[level][1]; i++){
+		items[i].found = false;
+	}
+	
+	//reset enemy found status
+	for(int i=0; i<level_size_items_enemies[level][2]; i++){
+		enemies[i].found = false;
+	}
+}
+
 void animate()
 {
 	//Check if player found exit
@@ -490,11 +514,17 @@ void animate()
 		if(level_found_items != level_size_items_enemies[level][1]){
 			cout << "Not enough objects!!" << endl;
 		}else{
-            cout << "Game Over!" << endl;
-            game_screen = GAMEOVER;
-            return;
-            //gameOverFlag = true;
-			//exitGame(true);
+			
+			//Player finished level
+			cout << "Player finished raw level " << level << endl;
+			
+			if(level == 2){
+				cout << "Game is over" << endl;
+				game_screen = GAMEOVER;
+			}else{
+				cout << "Moving to next level" << endl;
+				nextLevel();
+			}
 		}
     }
 	
@@ -704,7 +734,7 @@ void genMap()
     map.x=mapSize+2; map.z=mapSize+2;
     
     if(DEBUGGING){
-        printf("Loading...\n");
+        printf("Loading Map...\n");
     }
     
     srand( (unsigned)time( NULL ) );
@@ -891,7 +921,9 @@ void display()
         drawGameInstructions();
     }else if (game_screen == PLAY){
         drawMaze();
-    }
+    }else if(game_screen == GAMEOVER){
+		printf("game is finished!");
+	}
 	
     glutSwapBuffers();
 }
