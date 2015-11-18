@@ -31,10 +31,12 @@
 #define DEBUGGING TRUE
 
 //Amount of textures used and texture ids
-#define TEX_COUNT 2
+#define TEX_COUNT 4
 
 #define FLOOR_TEX 0
 #define WALL_TEX 1
+#define MAINMENU_TEX 2
+#define INSTRMENU_TEX 3
 
 //Amount of models and model ids
 #define MODEL_COUNT 10
@@ -302,7 +304,32 @@ void drawMenuScreen()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
-	
+    
+    glDisable(GL_LIGHTING);
+    
+    glBindTexture(GL_TEXTURE_2D, texName[MAINMENU_TEX]);
+    
+    glBegin(GL_POLYGON);
+    
+    glNormal3f(0.0, 1.0, 0.0);
+    
+    glTexCoord2f(0,0);
+    glVertex3f(-screenWidth/2, -screenHeight/2, 0);
+    
+    glTexCoord2f(700/7/4,0);
+    glVertex3f(screenWidth/2, -screenHeight/2, 0);
+    
+    glTexCoord2f(700/7/4,800/8/4);
+    glVertex3f(screenWidth/2, screenHeight/2, 0);
+    
+    glTexCoord2f(0,800/8/4);
+    glVertex3f(-screenWidth/2, screenHeight/2, 0);
+    
+    glEnd();
+    
+    glEnable(GL_LIGHTING);
+    
+    /*
 	glColor3d(1,1,1);
 	
 	char title1[] = "Las Aventuras de";
@@ -334,11 +361,44 @@ void drawMenuScreen()
 	xRaster = -2;
 	yRaster = -13.5;
 	draw3dString(GLUT_STROKE_ROMAN, salir, xRaster, yRaster, 0);
+    */
 }
 
 void drawGameInstructions()
 {
-	glColor3d(1,1,1);
+    glViewport(0, 0, screenWidth, screenHeight);
+    gluOrtho2D(0, screenWidth, 0, screenHeight);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
+    
+    glDisable(GL_LIGHTING);
+    
+    glBindTexture(GL_TEXTURE_2D, texName[INSTRMENU_TEX]);
+    
+    glBegin(GL_POLYGON);
+    
+    glNormal3f(0.0, 1.0, 0.0);
+    
+    glTexCoord2f(0,0);
+    glVertex3f(-screenWidth/2, -screenHeight/2, 0);
+    
+    glTexCoord2f(700/7/4,0);
+    glVertex3f(screenWidth/2, -screenHeight/2, 0);
+    
+    glTexCoord2f(700/7/4,800/8/4);
+    glVertex3f(screenWidth/2, screenHeight/2, 0);
+    
+    glTexCoord2f(0,800/8/4);
+    glVertex3f(-screenWidth/2, screenHeight/2, 0);
+    
+    glEnd();
+    
+    glEnable(GL_LIGHTING);
+	
+    /*
+     glColor3d(1,1,1);
 	
 	textSize = 1;
 	
@@ -356,6 +416,7 @@ void drawGameInstructions()
 	yRaster = -13;
 	char creditos2[] = "Iliana Garcia";
 	draw3dString(GLUT_STROKE_ROMAN, creditos2, xRaster, yRaster, 0);
+     */
 }
 
 void drawGameOverScreen()
@@ -963,6 +1024,8 @@ void init()
     
     loadImage("textures/floor.bmp", i++);
     loadImage("textures/wall.bmp", i++);
+    loadImage("textures/MenuPrincipal.bmp", i++);
+    loadImage("textures/Instrucciones.bmp", i++);
 	
 	//Load models
 	std::string ruta = fullPath + "objects/bacteria1.obj";
