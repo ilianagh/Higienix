@@ -45,6 +45,9 @@
 //Map limits
 #define MAX_MAP_SIZE 40
 
+//Level limits
+#define MAX_RAW_LEVEL 2
+
 using namespace std;
 
 /// FLAGS AND VARIABLES ///
@@ -87,15 +90,8 @@ bool runningFlag = false;
 int state = 0;
 int textSize = 1;
 
-//typedef enum {notPlaying, playing, playerWon, playerLost} states;
-//states game_state = notPlaying;
-
 typedef enum {MENU, INSTRUCTIONS, PLAY, GAMEOVER} screens;
 int game_screen = MENU;
-
-//bool gameOverFlag = false;
-
-//bool pauseFlag = false;
 
 /// OBJECT MODELS ///
 
@@ -322,7 +318,6 @@ void drawMenuScreen()
 	draw3dString(GLUT_STROKE_ROMAN, title2, xRaster, yRaster, 0);
 	
 	char jugar[] = "Jugar";
-	char niveles[] = "Niveles";
 	char instr[] = "Instrucciones";
 	
 	textSize = 1;
@@ -330,11 +325,8 @@ void drawMenuScreen()
 	xRaster = -3;
 	yRaster = -1;
 	draw3dString(GLUT_STROKE_ROMAN, jugar, xRaster, yRaster, 0);
-	xRaster = -4;
-	yRaster = -5;
-	draw3dString(GLUT_STROKE_ROMAN, niveles, xRaster, yRaster, 0);
 	xRaster = -7.5;
-	yRaster = -9;
+	yRaster = -5;
 	draw3dString(GLUT_STROKE_ROMAN, instr, xRaster, yRaster, 0);
 	
 	textSize = 1;
@@ -364,6 +356,39 @@ void drawGameInstructions()
 	yRaster = -13;
 	char creditos2[] = "Iliana Garcia";
 	draw3dString(GLUT_STROKE_ROMAN, creditos2, xRaster, yRaster, 0);
+}
+
+void drawGameOverScreen()
+{
+	glViewport(0, 0, screenWidth, screenHeight);
+	gluOrtho2D(0, screenWidth, 0, screenHeight);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0, 0, 25, 0, 0, 0, 0, 1, 0);
+	
+	glColor3d(1,1,1);
+	
+	xRaster = -12.5;
+	yRaster = 7;
+	char juego[] = "¡Felicidades!";
+	draw3dString(GLUT_STROKE_ROMAN, juego, xRaster, yRaster, 0, 0.04);
+	
+	xRaster = -15;
+	yRaster = -1;
+	char creditos1[] = "Haz terminado el juego";
+	draw3dString(GLUT_STROKE_ROMAN, creditos1, xRaster, yRaster, 0, 0.02);
+	
+	xRaster = -9;
+	yRaster = -5;
+	char inst1;
+	sprintf(&inst1, "con %d puntos!",points);
+	draw3dString(GLUT_STROKE_ROMAN, &inst1, xRaster, yRaster, 0, 0.02);
+	
+	xRaster = -8;
+	yRaster = -12;
+	char inst[] = "Presiona 'M' para volver al menu.";
+	draw3dString(GLUT_STROKE_ROMAN, inst, xRaster, yRaster, 0, 0.008);
 }
 
 void drawGameOVer()
@@ -490,12 +515,6 @@ void drawMaze()
 
 void nextLevel()
 {
-	level++;
-	level_found_items = 0;
-	mapSize = level_size_items_enemies[level][0];
-	mm = mapSize+1;
-	genMap();
-	
 	//reset item found status
 	for(int i=0; i<level_size_items_enemies[level][1]; i++){
 		items[i].found = false;
@@ -505,21 +524,28 @@ void nextLevel()
 	for(int i=0; i<level_size_items_enemies[level][2]; i++){
 		enemies[i].found = false;
 	}
+	
+	level++;
+	level_found_items = 0;
+	mapSize = level_size_items_enemies[level][0];
+	mm = mapSize+1;
+
+	genMap();
 }
 
 void animate()
 {
+	//test go directly to gameover screen
+	//game_screen = GAMEOVER;
+	
 	//Check if player found exit
     if ((player.x == maze_exit.x) && (player.z == maze_exit.z)){
 		if(level_found_items != level_size_items_enemies[level][1]){
 			cout << "Not enough objects!!" << endl;
 		}else{
-			
-			//Player finished level
-			cout << "Player finished raw level " << level << endl;
-			
-			if(level == 2){
-				cout << "Game is over" << endl;
+		
+			if(level == 0){
+			//if(level == MAX_RAW_LEVEL){
 				game_screen = GAMEOVER;
 			}else{
 				cout << "Moving to next level" << endl;
@@ -586,7 +612,6 @@ void animate()
     glutPostRedisplay();
 }
 
-//Makes the image into a texture, and returns the id of the texture
 void loadTexture(Image* image, int k)
 {
     glBindTexture(GL_TEXTURE_2D, texName[k]); //Tell OpenGL which texture to edit
@@ -916,13 +941,17 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
     if (game_screen == MENU){
+		//cout << "menu" << endl;
         drawMenuScreen();
     }else if (game_screen == INSTRUCTIONS){
+		//cout << "instrucions" << endl;
         drawGameInstructions();
     }else if (game_screen == PLAY){
+		//cout << "play" << endl;
         drawMaze();
     }else if(game_screen == GAMEOVER){
-		printf("game is finished!");
+		//cout << "gameover" << endl;
+		drawGameOverScreen();
 	}
 	
     glutSwapBuffers();
@@ -946,6 +975,7 @@ void reshape(int w, int h)
 void keyboard(unsigned char key, int x, int y)
 {
     if (game_screen != PLAY) {
+		
         switch (key){
             case 'm':
             case 'M':
@@ -954,10 +984,6 @@ void keyboard(unsigned char key, int x, int y)
             case 'j': // jugar
             case 'J':
                 game_screen = PLAY;
-                //game_state = playing;
-                break;
-            case 'n': // niveles
-            case 'N':
                 break;
             case 'i': // instrucciones
             case 'I':
@@ -969,16 +995,9 @@ void keyboard(unsigned char key, int x, int y)
                     game_screen = INSTRUCTIONS;
                 }
                 break;
-//            case 'p':
-//            case 'P':
-//                if (game_screen == PLAY)
-//                {
-//                    pauseFlag = !pauseFlag;
-//                }
-//                break;
             case 27: //esc - salir
-                exit(0); //terminate the program
-            default:
+                exit(0);
+			default:
                 break; //do nothing
         }
     }
