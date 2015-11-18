@@ -533,6 +533,50 @@ void nextLevel()
 	genMap();
 }
 
+void setupMaze()
+{
+	//reset item found status
+	for(int i=0; i<level_size_items_enemies[level][1]; i++){
+		items[i].found = false;
+	}
+	
+	//reset enemy found status
+	for(int i=0; i<level_size_items_enemies[level][2]; i++){
+		enemies[i].found = false;
+	}
+	
+	points = 0;
+	level = 0;
+	level_found_items = 0;
+	mapSize = level_size_items_enemies[0][0];
+	mm = mapSize+1;
+	
+	game_screen = PLAY;
+	
+	genMap();
+}
+
+void quitMaze()
+{
+	//reset item found status
+	for(int i=0; i<level_size_items_enemies[level][1]; i++){
+		items[i].found = false;
+	}
+	
+	//reset enemy found status
+	for(int i=0; i<level_size_items_enemies[level][2]; i++){
+		enemies[i].found = false;
+	}
+	
+	points = 0;
+	level = 0;
+	level_found_items = 0;
+	mapSize = level_size_items_enemies[0][0];
+	mm = mapSize+1;
+	
+	game_screen = MENU;
+}
+
 void animate()
 {
 	//test go directly to gameover screen
@@ -983,7 +1027,7 @@ void keyboard(unsigned char key, int x, int y)
                 break;
             case 'j': // jugar
             case 'J':
-                game_screen = PLAY;
+				setupMaze();
                 break;
             case 'i': // instrucciones
             case 'I':
@@ -1040,14 +1084,14 @@ void keyboard(unsigned char key, int x, int y)
             
             case 'm':
             case 'M':
-                game_screen = MENU;
+                quitMaze();
                 break;
                 
             default:
                 break;
         }
     }
-    
+	
     glutPostRedisplay();
 }
 
